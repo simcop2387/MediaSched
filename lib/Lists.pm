@@ -7,7 +7,7 @@ use Data::Dumper;
 use State;
 use Log;
 use DB;
-use Config;
+use MediaConfig;
 
 use POE qw(Session);
 
@@ -52,7 +52,7 @@ sub getepisode
 	
 	if (!defined($id))
 	{#once i have this as recursive, i'll move this into a real file
-		($list, $id) = ($Config::options{defaultlist}, -1);
+		($list, $id) = (get_config("defaultlist"), -1);
 	}
 	
 	debug 3, "Got List $id";
@@ -82,7 +82,7 @@ sub findentity
 {
 	my $entity = shift; #some file or directory to find
 	
-	for my $path (@{$Config::options{storage}})
+	for my $path (@{get_config("storage")})
 	{
 		if (-e $path . "/" . $entity)
 		{

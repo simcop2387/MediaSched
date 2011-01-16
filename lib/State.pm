@@ -3,7 +3,7 @@ package State;
 use strict;
 use warnings;
 
-use Config;
+use MediaConfig;
 
 require Exporter;
 use base qw(Exporter);
@@ -19,12 +19,12 @@ END {savestate()}; # make sure to save the state whenever we close
 
 sub savestate
 {
-	lock_nstore \%state, $Config::options{statefile};
+	lock_nstore \%state, get_config("statefile");
 }
 
 sub loadstate
 {
-	%state = %{retrieve($Config::options{statefile})} if (-e $Config::options{statefile});
+	%state = %{retrieve(get_config("statefile"))} if (-e get_config("statefile"));
 }
 
 loadstate();
