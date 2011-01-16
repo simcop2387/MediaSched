@@ -7,6 +7,7 @@ use Data::Dumper;
 use State;
 use Log;
 use DB;
+use Config;
 
 use POE qw(Session);
 
@@ -16,13 +17,6 @@ my $ses = POE::Session->create(
       Lists => [ qw(_start getepisode) ],
 	],
 	heap =>{shows=>[]});
-
-
-our $basepaths = ["/mnt/server/pub/Movies/",
-                  "/mythtv/record/",
-                  "/mythtv2/record/",
-		  "/mnt/ryans/torrents/",
-		  "/home/music/television/defaults/"];
 
 my $videoregex = qr/(flv|wmv|asf|rm(vb)?|ogm|mkv|avi|mpe?g|m4v)$/i;
 
@@ -58,9 +52,7 @@ sub getepisode
 	
 	if (!defined($id))
 	{#once i have this as recursive, i'll move this into a real file
-		($list, $id) = ("masterdefault.lst", -1);
-#		($list, $id) = ("!TV Shows/Futurama:7\n!simpsons:17\n!The Three Stooges:15\n!TV Shows/Family Guy/test.channel.list:11\n!TV Shows/Robot Chicken:4", -1023);
-#		($list, $id) = ("!TV Shows/Futurama:1\n!mythtv~Family Guy:1", -1024);
+		($list, $id) = ($Config::options{defaultlist}, -1);
 	}
 	
 	debug 3, "Got List $id";
@@ -90,7 +82,7 @@ sub findentity
 {
 	my $entity = shift; #some file or directory to find
 	
-	for my $path (@$basepaths)
+	for my $path (@{$Config::options{storage}})
 	{
 		if (-e $path . "/" . $entity)
 		{
@@ -202,6 +194,8 @@ sub readFileFromPlaylist
   }
 }
 
+#NOTE TO SELF, make a good comment here, this is insidiously complex code that should be cleaned up but almost can't be.
+# so someone looking at it thinks that you're insane
 sub parseListEntry
 {
   my $listout = shift;

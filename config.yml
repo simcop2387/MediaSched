@@ -2,3 +2,7 @@ statefile: tv.state
 defaultlist: defaults/masterdefault.lst
 storage: 
 	- /mnt/server/pub/Movies/
+	- /mythtv/record/
+	- /mythtv2/record/
+	- /mnt/ryans/torrents/
+	- /home/music/television/defaults/
