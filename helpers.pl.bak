@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use Time::HiRes;
+use Movie::Info;
+use IPC::Open2;
+use IO::Handle;
+
+my $_state;
+
+require 'database.pl';
+my $videopath = "/mnt/server/pub/Movies";
+
+sub mp_addfile
+{
+  my $file = shift;
+
+  print "/usr/bin/mplayer $videopath/$file\n";
+  system("/usr/bin/mplayer","$videopath/$file");
+}
+
+sub getmovielen
+{
+  my $file = shift;
+
+  my $mi = Movie::Info->new or die "inf: $!";
+  my %info = $mi->info($videopath."/".$file) or die "INF: $!";
+  my $len = $info{length};
+  return $len;
+}
+
+sub addmovie
+{
+  my $time = shift;
+
+  print "getting entry\n";  
+  my $next = parseListEntry(mc_db_getlist($time));
+
+  print "-" x 30 . "\n";
+  print Dumper($next);
+
+  return unless defined($next);
+
+  chomp $next;
+
+  my $len = getmovielen($next);
+  print "Adding movie, $next\n";
+  mp_addfile($next);
+}
+
+sub mainloop
+{
+   print "adding movie\n";
+   addmovie(time());
+}
+
+sub debug
+{
+ my $level = shift;
+ my $debuglevel = 3;
+ if ($debuglevel >= $level)
+ {
+   print @_;
+ }
+}
+
+sub readFileFromPlaylist
+{
+  my $file = shift;
+
+  open($pl, "<${videopath}/${file}");
+  my @list = grep(!/^#/, <$pl>);
+  close($pl);
+  s/\\/\//g for @list;
+  {
+    local $/ = "\r\n";
+    chomp @list;
+  };  
+
+  return $list[rand($#list+1)];
+}
+
+sub parseListEntry
+{
+  my $listout = shift;
+  my $cid = shift;
+  
+  my $pl;
+  my $next;
+  
+  my (@lists, @count, @ratio, $calid, $lastint);
+  $calid = 0;
+  $lastint = 0;
+  
+  @lists = @{$_state->{lists}} if defined($_state->{lists});
+  @count = @{$_state->{count}} if defined($_state->{count});
+  @ratio = @{$_state->{ratio}} if defined($_state->{ratio});
+  $calid = $_state->{calid} if defined($_state->{calid});
+  $lastint = $_state->{lastint} if defined($_state->{lastint});
+  
+   if ($listout !~ /^!/)
+   {
+     $next = readFileFromPlaylist($listout);
+   }
+   else
+   {
+     $listout =~ s/!//g;
+     my @lines = split(/\n/, $listout);
+     #!The Beatles.m3u:1
+     if ($cid != $calid)
+     {
+       print("we have a new one! initilize!!! $cid $calid $lastint\n");
+       $calid = $cid;
+       @lists = ();
+       @count = ();
+       @ratio = ();
+
+       print Dumper(\@lines);       
+
+       for (@lines)
+       {
+         my ($list, $portion) = split(/:/, $_);
+         $portion =~ s/[\r\n]//g;
+         if (($list ne "") && defined($portion) && ($portion != 0))
+         {
+           push @lists, $list;
+           push @count, 1;
+           push @ratio, $portion;
+         }
+       }
+     }
+     
+     my $q;
+     my $s;
+    
+     GETNEWLIST:
+     #pick new list, then song
+     print Dumper(\@ratio);
+     $lastint = ($lastint+1) % @count;
+     $q = $ratio[($lastint+1)% @ratio]/$ratio[$lastint];
+     $s = $count[($lastint+1)% @count]/$count[$lastint];
+     
+     if ($s >= $q)
+     {
+       $count[$lastint]++;
+       $next = readFileFromPlaylist($lists[$lastint]);
+     }
+     else
+     {
+       goto GETNEWLIST;
+     }
+   }
+   
+  $_state->{lists} = [@lists];
+  $_state->{count} = [@count];
+  $_state->{ratio} = [@ratio];
+  $_state->{calid} = $calid;
+  $_state->{lastint} = $lastint;
+  
+  return $next;
+}
+
+$_state = do "/home/music/moviestate.ddp";
+  
+print "$! :: $@\n" unless defined($_state);
+$_state = {} unless defined($_state);
+
+while(1)
+{
+my $st = mainloop(); #we only do this ONCE
+
+open (FH_DUEL, ">/home/music/moviestate.ddp");
+print FH_DUEL Dumper($_state);
+close(FH_DUEL);
+}

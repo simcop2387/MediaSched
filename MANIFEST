@@ -1,0 +1,6 @@
+MANIFEST
+database.pl
+helpers.pl
+generate.pl
+hourly.tmpl
+half.tmpl
