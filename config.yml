@@ -1,0 +1,4 @@
+statefile: tv.state
+defaultlist: defaults/masterdefault.lst
+storage: 
+	- /mnt/server/pub/Movies/
