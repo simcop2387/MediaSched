@@ -50,7 +50,7 @@ sub playfile
 	}
 	else
 	{
-		system("mplayer", "/mnt/server/pub/$file");
+		system("mplayer", "$file");
 	}
 
 	$kernel->yield(playfile=>);
