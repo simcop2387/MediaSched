@@ -57,7 +57,6 @@ The older version is still in use by me, and has two forks, one for mplayer and 
 ** MPD
 ** Mplayer
 ** Generic command
-* Customized inclusion and exclusion rules for file (check back tomorrow)
 * Some basic caching of the ical file, so that it works better on slow links.
 * Finish the Pluggable source/storage code
 
