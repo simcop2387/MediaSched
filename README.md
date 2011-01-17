@@ -38,10 +38,10 @@ There's a simple config.yml file here, should be mostly self explanitory.
   
     This is where you tell it what files to include when scanning a directory (it's always recursive) rather than an explicitly created playlist
 
-** include
+* * include
   > These regular expressions are ORed together to decide if a file should be played, if any of them match it'll consider the file for playback.
 
-** exclude
+* * exclude
   > These regular expressions are ORed together to decide if a file should be ignored and not played back under any circumstances.  There is an implicit one for the directories . and ..
 
 # HISTORY
