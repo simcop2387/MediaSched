@@ -14,15 +14,15 @@ There's a simple config.yml file here, should be mostly self explanitory.
     calendar: http://www.google.com/calendar/ical/pipnb40ro3uhnce0oc36a0n0sk%40group.calendar.google.com/public/basic.ics
     timezone: America/New_York
 
-## statefile
+* statefile
   where we keep track of the past, this is necessary right now (that will change).
-## defaultlist
+* defaultlist
   the default when there isn't anything scheduled, will make this nicer in the future, this is looked for in the storage directories
-## storage
+* storage
   where we look to find any of the files we're after, videos, playlists, directories themselves, etc.
-## calendar 
+* calendar 
   where we can find an ical formatted file that tells us what we play
-## timezone 
+* timezone 
   the local timezone, this is to make sure that things all line up correctly
 
 # HISTORY
