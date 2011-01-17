@@ -3,17 +3,16 @@ I won't claim this will work for anyone else yet.
 
 # CONFIG
 There's a simple config.yml file here, should be mostly self explanitory.
-
-  statefile: tv.state
-  defaultlist: masterdefault.lst
-  storage:
+    statefile: tv.state
+    defaultlist: masterdefault.lst
+    storage:
         - /mnt/server/pub/Movies/
         - /mythtv/record/
         - /mythtv2/record/
         - /mnt/ryans/torrents/
         - /home/music/television/defaults/
-  calendar: http://www.google.com/calendar/ical/pipnb40ro3uhnce0oc36a0n0sk%40group.calendar.google.com/public/basic.ics
-  timezone: America/New_York
+    calendar: http://www.google.com/calendar/ical/pipnb40ro3uhnce0oc36a0n0sk%40group.calendar.google.com/public/basic.ics
+    timezone: America/New_York
 
 ## statefile
   where we keep track of the past, this is necessary right now (that will change).
