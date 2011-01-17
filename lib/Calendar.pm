@@ -30,12 +30,11 @@ sub get_sched {
 	my $time = shift; # get the time we're asked about
 	my $ical = get_calendar();
 	my $calendar = Data::ICal->new(data => $ical);
-	print $ical;
-	#sleep 10;
 	
 	die $calendar->error_message() unless $calendar;
 	# FIX THIS TO ACCEPT $TIME!
 	my $nowdt = DateTime->now();
+	$nowdt->set_time_zone(get_config("timezone"));
 	
 	#collect all the events possible
 	my @events;
@@ -45,15 +44,18 @@ sub get_sched {
     	my $dtstart = $iso8601->parse_datetime( _prop($event, 'DTSTART') );
     	my $dtend   = $iso8601->parse_datetime( _prop($event, 'DTEND') );
     	
+    	#set the time zone
+    	$_->set_time_zone(get_config("timezone")) for ($dtstart, $dtend);
+    	
     	# create a subref for this, makes code cleaner below
-    	my $checkandadd = sub { 
-    		if (_checktimeonly($nowdt, $dtstart, $dtend)) {
+    	my $checkandadd = sub {
+    		if (_checktimeonly($nowdt, $dtstart, $dtend, $event)) {
     			push @events, $event;
     		}
     	};
     	
     	#check if we've even come up to the start time, otherwise just throw it out
-    	#next if ($nowdt < $dtstart); # commented out to make it process them all for testing
+    	next if ($nowdt < $dtstart); # commented out to make it process them all for testing
     	
     	#are we a repeating entry?
     	if (my $rrule = _prop($event, "rrule")) {
@@ -153,9 +155,12 @@ sub get_sched {
 	
 	# in case we've got more than one event, we're going to sort them by creation time
 	my @sevents = map {$_->[1]} sort {$a->[0] cmp $b->[0]} map {[_prop($_, "created"), $_]} @events;
-	print Dumper(\@events);
-	
-	return (_prop($sevents[0], "description"), _prop($sevents[0], "uid"))
+	_printentry($_) for (@sevents);
+#	sleep(30);
+
+    if (@sevents) {
+    	return (_prop($sevents[0], "description"), _prop($sevents[0], "uid"))
+    }
 }
 
 # borrowed from Data::ICal example
@@ -166,7 +171,7 @@ sub _prop {
 }
 
 sub _checktimeonly {
-	my ($now, $_start, $_end) = @_; 
+	my ($now, $_start, $_end, $entry) = @_;
 	my ($start, $end) = ($_start->clone(), $_end->clone()); # clone them since we need to alter them
 	
 	for ($start, $end) {
@@ -175,11 +180,25 @@ sub _checktimeonly {
 		$_->set_day($now->day());
 	}
 	
+	_printentry($entry);
+	print "CHECKTIME: ", $now->hms(), " ", $start->hms(), "-", $end->hms(), "\n";
+	
 	if ($now >= $start && $now < $end) {
 		return 1;
 	} else {
 		return 0;
 	}
+}
+
+sub _printentry {
+	my $entry = shift;
+	
+	print "---\n",
+	      _prop($entry, "summary"), "\n",
+	      _prop($entry, "uid"), "\n",
+	      _prop($entry, "created"), " ", _prop($entry, "dtstart"), "-", _prop($entry, "dtend"), "\n",
+	      _prop($entry, "rrule"), "\n",
+	      _prop($entry, "description"), "\n\n";
 }
 
 1;

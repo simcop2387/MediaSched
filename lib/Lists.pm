@@ -6,7 +6,7 @@ use Data::Dumper;
 
 use State;
 use Log;
-use DB;
+use Calendar;
 use MediaConfig;
 
 use POE qw(Session);
@@ -48,7 +48,7 @@ sub getepisode
 	my ($kernel) = $_[KERNEL];
 	debug 3, "Getepisode called";
 	
-	my ($list, $id) = DB::mc_db_getlist(time);
+	my ($list, $id) = Calendar::get_sched(time);
 	
 	if (!defined($id))
 	{#once i have this as recursive, i'll move this into a real file
