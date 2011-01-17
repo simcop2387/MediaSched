@@ -39,12 +39,10 @@ There's a simple config.yml file here, should be mostly self explanitory.
     This is where you tell it what files to include when scanning a directory (it's always recursive) rather than an explicitly created playlist
 
 ** include
-
-    These regular expressions are ORed together to decide if a file should be played, if any of them match it'll consider the file for playback.
+  > These regular expressions are ORed together to decide if a file should be played, if any of them match it'll consider the file for playback.
 
 ** exclude
-
-    These regular expressions are ORed together to decide if a file should be ignored and not played back under any circumstances.  There is an implicit one for the directories . and ..
+  > These regular expressions are ORed together to decide if a file should be ignored and not played back under any circumstances.  There is an implicit one for the directories . and ..
 
 # HISTORY
 an older version of this software was originally written to use the database of WebCalendar (http://www.k5n.us/webcalendar.php) directly (from the 2007 era).
