@@ -13,3 +13,4 @@ directoryscan:
         - \.(?:flv|wmv|asf|rm(vb)?|ogm|mkv|avi|mpe?g|m4v)$
     exclude: 
         - \(noauto\)
+player: Mplayer
