@@ -1,5 +1,7 @@
 package State;
 
+# ABSTRACT: turns baubles into trinkets
+
 use strict;
 use warnings;
 

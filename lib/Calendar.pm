@@ -1,5 +1,7 @@
 package Calendar;
 
+# ABSTRACT: turns baubles into trinkets
+
 use strict;
 use warnings;
 use feature qw(switch);

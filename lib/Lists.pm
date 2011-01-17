@@ -1,5 +1,7 @@
 package Lists;
 
+# ABSTRACT: turns baubles into trinkets
+
 use strict;
 use warnings;
 use Data::Dumper;
