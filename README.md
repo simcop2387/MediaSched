@@ -13,21 +13,38 @@ There's a simple config.yml file here, should be mostly self explanitory.
         - /home/music/television/defaults/
     calendar: http://www.google.com/calendar/ical/pipnb40ro3uhnce0oc36a0n0sk%40group.calendar.google.com/public/basic.ics
     timezone: America/New_York
+    directoryscan:
+        include: 
+            - \.(?:flv|wmv|asf|rm(vb)?|ogm|mkv|avi|mpe?g|m4v)$
+        exclude: 
+            - \(noauto\)
 
-statefile
-:  where we keep track of the past, this is necessary right now (that will change).
+* statefile
+    where we keep track of the past, this is necessary right now (that will change).
 
-defaultlist
-:  the default when there isn't anything scheduled, will make this nicer in the future, this is looked for in the storage directories
+* defaultlist
+    the default when there isn't anything scheduled, will make this nicer in the future, this is looked for in the storage directories
 
-storage
-:  where we look to find any of the files we're after, videos, playlists, directories themselves, etc.
+* storage
+    where we look to find any of the files we're after, videos, playlists, directories themselves, etc.
 
-calendar 
-:  where we can find an ical formatted file that tells us what we play
+* calendar 
+    where we can find an ical formatted file that tells us what we play
 
-timezone 
-:  the local timezone, this is to make sure that things all line up correctly
+* timezone 
+    the local timezone, this is to make sure that things all line up correctly
+
+* directoryscan
+  
+    This is where you tell it what files to include when scanning a directory (it's always recursive) rather than an explicitly created playlist
+
+** include
+
+    These regular expressions are ORed together to decide if a file should be played, if any of them match it'll consider the file for playback.
+
+** exclude
+
+    These regular expressions are ORed together to decide if a file should be ignored and not played back under any circumstances.  There is an implicit one for the directories . and ..
 
 # HISTORY
 an older version of this software was originally written to use the database of WebCalendar (http://www.k5n.us/webcalendar.php) directly (from the 2007 era).
