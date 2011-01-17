@@ -8,13 +8,27 @@ use MediaConfig;
 
 use Data::Dumper;
 use Data::ICal;
-use LWP::UserAgent;
+use LWP::UserAgent::POE; # for async http at least
 use DateTime;
 use DateTime::Format::ISO8601;	
 
+use POE qw(Session);
+
+my $ses = POE::Session->create(
+  package_states => 
+    [
+      Calendar => [ qw(_start get_sched) ],
+	],);
+
 #no need to recreate this all the time
-my $ua = LWP::UserAgent->new();
+my $ua = LWP::UserAgent::POE->new();
 my $iso8601 = DateTime::Format::ISO8601->new;
+
+sub _start {
+	my ($kernel, $heap) = @_[KERNEL, HEAP];
+
+	$kernel->alias_set("Calendar");
+}
 
 sub get_calendar {
 	my $res = $ua->get(get_config("calendar"));
@@ -27,7 +41,7 @@ sub get_calendar {
 }
 
 sub get_sched {
-	my $time = shift; # get the time we're asked about
+	my $time = $_[ARG0]; # get the time we're asked about
 	my $ical = get_calendar();
 	my $calendar = Data::ICal->new(data => $ical);
 	

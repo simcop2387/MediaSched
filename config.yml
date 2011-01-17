@@ -8,3 +8,8 @@ storage:
         - /home/music/television/defaults/
 calendar: http://www.google.com/calendar/ical/pipnb40ro3uhnce0oc36a0n0sk%40group.calendar.google.com/public/basic.ics
 timezone: America/New_York
+directoryscan:
+    include: 
+        - \.(?:flv|wmv|asf|rm(vb)?|ogm|mkv|avi|mpe?g|m4v)$
+    exclude: 
+        - \(noauto\)

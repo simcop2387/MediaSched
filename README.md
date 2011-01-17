@@ -37,7 +37,14 @@ The older version is still in use by me, and has two forks, one for mplayer and 
 # TODO
 * Authentication for http/ftp for the calendar file.  This will let you use a private google calendar.
 * Pluggable player support.
-* * MPD
-* * Mplayer
-* * Generic command
+** MPD
+** Mplayer
+** Generic command
 * Customized inclusion and exclusion rules for file (check back tomorrow)
+* Some basic caching of the ical file, so that it works better on slow links.
+* Finish the Pluggable source/storage code
+
+    This is all about being able to collect things from other places (mostly mythtv in my case) for playback
+
+# DEPENDENCIES
+lots.  figure them out for yourself until i get it all packaged up nicely.

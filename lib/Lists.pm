@@ -3,6 +3,7 @@ package Lists;
 use strict;
 use warnings;
 use Data::Dumper;
+use List::Util qw/reduce/;
 
 use State;
 use Log;
@@ -16,16 +17,20 @@ my $ses = POE::Session->create(
     [
       Lists => [ qw(_start getepisode) ],
 	],
-	heap =>{shows=>[]});
-
-my $videoregex = qr/(flv|wmv|asf|rm(vb)?|ogm|mkv|avi|mpe?g|m4v)$/i;
+	heap =>{shows=>[], includeregex=>undef, excluderegex=>undef});
 
 sub _start
 {
 	my ($kernel, $heap) = @_[KERNEL, HEAP];
 
 	$kernel->alias_set("Lists");
-	#nothing to do fucking POE
+	my $scan = get_config("directoryscan");
+	
+	my $include = reduce {qr/$a|$b/i} map {qr/$_/i} @{$scan->{include}};
+	my $exclude = reduce {qr/$a|$b/i} map {qr/$_/i} @{$scan->{exclude}};
+	
+	$heap->{excluderegex} = $exclude;
+	$heap->{includeregex} = $include;
 }
 
 sub cleanandsplit
@@ -45,10 +50,10 @@ sub cleanandsplit
 
 sub getepisode
 {
-	my ($kernel) = $_[KERNEL];
+	my ($kernel, $heap) = @_[KERNEL, HEAP];
 	debug 3, "Getepisode called";
 	
-	my ($list, $id) = Calendar::get_sched(time);
+	my ($list, $id) = $kernel->call(Calendar => get_sched => time());
 	
 	if (!defined($id))
 	{#once i have this as recursive, i'll move this into a real file
@@ -57,7 +62,7 @@ sub getepisode
 	
 	debug 3, "Got List $id";
 	
-	my $file = resolveEntry($list, $id);
+	my $file = resolveEntry($list, $id, $heap);
 	
 	if ($file =~ /^mythtv~(.*)/) #grab the mythtv stuff, i'll extend this later to support specific episodes
 	{
@@ -72,9 +77,10 @@ sub resolveEntry
 {
 	my $list = shift;
 	my $id = shift;
+	my $heap = shift;
 	
 	my $filename = parseListEntry($list, $id);
-	my $file = readFileFromPlaylist($filename, $id);
+	my $file = readFileFromPlaylist($filename, $id, $heap);
 	
 }
 
@@ -96,6 +102,7 @@ sub findentity
 sub getDirectoryList
 {
   my $parent=shift;
+  my $heap=shift;
 
   my @prelist;
   my @list;  
@@ -105,9 +112,7 @@ sub getDirectoryList
   @prelist = readdir($dh);
   closedir($dh);
 
-  @prelist = grep {!/\(noauto\)/i && !/^\.\.?$/} @prelist;
-
-  #/(flv|wmv|asf|rm(vb)?|ogm|mkv|avi|mpe?g)$/i
+  @prelist = grep {$_ !~ $heap->{excluderegex} && !/^\.\.?$/} @prelist;
 
 
   for (@prelist)
@@ -116,10 +121,10 @@ sub getDirectoryList
   }
   for (@prelist)
   {
-    push @list, $parent."/".$_ if (-f "$parent/$_" && /$videoregex/);
+    push @list, $parent."/".$_ if (-f "$parent/$_" && $_ =~ $heap->{includeregex});
   }
 
-  push @list, getFileList($parent."/".$_) for (@dir);
+  push @list, getFileList($parent."/".$_, $heap) for (@dir);
 
   return @list;
 }
@@ -127,11 +132,12 @@ sub getDirectoryList
 sub getFileList
 {
   my $filename = shift;
+  my $heap = shift;
   my $file = findentity($filename);
   
   if (-d $file)
   {
-    return join "\n", getDirectoryList($file);
+    return join "\n", getDirectoryList($file, $heap);
   }
   elsif (-T $file)
   {
@@ -151,6 +157,7 @@ sub readFileFromPlaylist
 {
   my $file = shift;
   my $stateid = shift || $file;
+  my $heap = shift;
   my $pl;
   
   print "RFFPL\n$file\n$stateid\n\n";
@@ -167,7 +174,7 @@ sub readFileFromPlaylist
       $_state->{playlists}{$stateid}=-1;
     }
 
-    my $list=getFileList($file);
+    my $list=getFileList($file, $heap);
 	debug 3, "$stateid :: $list";
     my @list=sort split(/\n/, $list);
 	debug 3, Dumper(\@list);
@@ -180,11 +187,11 @@ sub readFileFromPlaylist
   {
     print "\n\nOpening <",$file," from ",findentity($file),"\n\n\n";
 
-    my $list=getFileList($file);
+    my $list=getFileList($file, $heap);
     
     if ($list =~ /\n./)
     {
-    	my $next=resolveEntry($list, $stateid."::".$file);#we append the file to the id, so that we get separate ids
+    	my $next=resolveEntry($list, $stateid."::".$file, $heap);#we append the file to the id, so that we get separate ids
     	return $next;
     }
     else
