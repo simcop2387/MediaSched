@@ -30,6 +30,8 @@ sub get_sched {
 	my $time = shift; # get the time we're asked about
 	my $ical = get_calendar();
 	my $calendar = Data::ICal->new(data => $ical);
+	print $ical;
+	#sleep 10;
 	
 	die $calendar->error_message() unless $calendar;
 	# FIX THIS TO ACCEPT $TIME!
@@ -43,11 +45,23 @@ sub get_sched {
     	my $dtstart = $iso8601->parse_datetime( _prop($event, 'DTSTART') );
     	my $dtend   = $iso8601->parse_datetime( _prop($event, 'DTEND') );
     	
+    	# create a subref for this, makes code cleaner below
+    	my $checkandadd = sub { 
+    		if (_checktimeonly($nowdt, $dtstart, $dtend)) {
+    			push @events, $event;
+    		}
+    	};
+    	
+    	#check if we've even come up to the start time, otherwise just throw it out
+    	#next if ($nowdt < $dtstart); # commented out to make it process them all for testing
+    	
+    	#are we a repeating entry?
     	if (my $rrule = _prop($event, "rrule")) {
     		print "REPEAT: $rrule :: "._prop($event, "description")."\n\n";
     		
     		my ($freq) = ($rrule =~ /FREQ=([^;]+)/g);
     		
+    		# does the repeat end at some point?
     		if ($rrule =~ /UNTIL/) {
     			my ($_until) = ($rrule =~ /UNTIL=([^;]+)/g);
     			my $until = $iso8601->parse_datetime($_until);
@@ -57,12 +71,76 @@ sub get_sched {
     		
     		given ($freq) {
     			when ("DAILY") {
+    				if ($rrule =~ /INTERVAL=(\d+)/) {
+    					my $inter = $1;
+    					my ($now, $start) = ($nowdt->clone(), $dtstart->clone());
+    				
+    					# truncate the times off, this way we can count the days correctly and not have horrible fractional parts to deal with
+    					$_->truncate(to => "day") for ($now, $start);
+    				
+    					my $dur = $now - $start;
+    					
+    					if ($dur->days() % $inter == 0) { # we're on the interval now
+    						$checkandadd->();
+    					} 
+    				} else {
+    					$checkandadd->();
+    				}
     			}
     			when ("WEEKLY") {
     				my %dow = (SU => 7, MO => 1, TU => 2, WE => 3, TH => 4, FR => 5, SA => 6);
     				my @days = map {$dow{$_}} split(/,/, ($rrule =~ /BYDAY=([$;]+)/));
     				
-    				for ($now
+    				my $dow = $nowdt->dow();
+    				
+    				if (grep {$_ == $dow} @days) { # are we the right day of week?
+    				   $checkandadd->();
+    				}
+    			}
+    			when ("MONTHLY") {
+    				
+    				if ($rrule =~ /BYDAY=(\d)(\w\w)/) {
+    					my %dow = (SU => 7, MO => 1, TU => 2, WE => 3, TH => 4, FR => 5, SA => 6);
+    					my ($num, $day) = ($1, $dow{$2});
+    					
+    					my $month = $nowdt->clone()->truncate(to => "month");
+    					
+    					#this bit is borrowed from the DateTime wiki, to calculate the "$num{st,nd,rd,th} $day" of the month
+						my $dow = $month->day_of_week();
+						$month->add(
+    						days  => ( $day - $dow + 7 ) % 7,
+    						weeks => $num - 1
+						);
+						
+						# did we get today? if we did then we're on the right one
+						if ($nowdt->clone()->truncate(to=>"day") == $month) {
+							$checkandadd->();
+						}
+    				} elsif ($rrule =~ /BYMONTHDAY=(\d+)/) {
+    					my $day = $1;
+
+    					# this check is very simple, check if we're the same day of the month as above
+    					if ($nowdt->day() == $day) {
+    						$checkandadd->();
+    					}
+    				} else { die "Unhandled repeat type: $rrule"; }
+       			}
+    			when ("YEARLY") {
+    				if ($rrule =~ /INTERVAL=(\d+)/) {
+    					my $inter = $1;
+    					my ($now, $start) = ($nowdt->clone(), $dtstart->clone());
+    				
+    					# truncate the times off, this way we can count the days correctly and not have horrible fractional parts to deal with
+    					$_->truncate(to => "year") for ($now, $start);
+    				
+    					my $dur = $now - $start;
+    					
+    					if ($dur->years() % $inter == 0) { # we're on the interval now
+    						$checkandadd->();
+    					} 
+    				} else {
+    					$checkandadd->();
+    				}
     			}
     		}
     	} else {
@@ -72,6 +150,12 @@ sub get_sched {
     		}
     	}
 	}
+	
+	# in case we've got more than one event, we're going to sort them by creation time
+	my @sevents = map {$_->[1]} sort {$a->[0] cmp $b->[0]} map {[_prop($_, "created"), $_]} @events;
+	print Dumper(\@events);
+	
+	return (_prop($sevents[0], "description"), _prop($sevents[0], "uid"))
 }
 
 # borrowed from Data::ICal example
@@ -79,6 +163,23 @@ sub _prop {
     my($event, $key) = @_;
     my $v = $event->property($key) or return;
     $v->[0]->value;
+}
+
+sub _checktimeonly {
+	my ($now, $_start, $_end) = @_; 
+	my ($start, $end) = ($_start->clone(), $_end->clone()); # clone them since we need to alter them
+	
+	for ($start, $end) {
+		$_->set_year($now->year());
+		$_->set_month($now->month());
+		$_->set_day($now->day());
+	}
+	
+	if ($now >= $start && $now < $end) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 1;

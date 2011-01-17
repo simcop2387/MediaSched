@@ -15,7 +15,6 @@ my %options;
 sub init_config {
 	#hardcoded location in current directory, might change this to something a little more flexible, or at least parse @ARGV for an alternate, not important right now
 	my $cf = LoadFile("config.yml");
-	print Dumper($cf);
 
 	#check some things we need
 	if (ref($cf) ne "HASH" || !$cf->{defaultlist} || !$cf->{statefile} || !$cf->{storage}) {
@@ -23,8 +22,6 @@ sub init_config {
 	}
 
 	%options = %$cf; # put it in the hash, looks nicer later
-
-	print Dumper(\%options);
 }
 
 sub get_config {
