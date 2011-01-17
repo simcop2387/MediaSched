@@ -38,11 +38,11 @@ There's a simple config.yml file here, should be mostly self explanitory.
   
   > This is where you tell it what files to include when scanning a directory (it's always recursive) rather than an explicitly created playlist
 
-* * include
-  > These regular expressions are ORed together to decide if a file should be played, if any of them match it'll consider the file for playback.
+  * include
+    > These regular expressions are ORed together to decide if a file should be played, if any of them match it'll consider the file for playback.
 
-* * exclude
-  > These regular expressions are ORed together to decide if a file should be ignored and not played back under any circumstances.  There is an implicit one for the directories . and ..
+  * exclude
+    > These regular expressions are ORed together to decide if a file should be ignored and not played back under any circumstances.  There is an implicit one for the directories . and ..
 
 # HISTORY
 an older version of this software was originally written to use the database of WebCalendar (http://www.k5n.us/webcalendar.php) directly (from the 2007 era).
@@ -52,9 +52,9 @@ The older version is still in use by me, and has two forks, one for mplayer and 
 # TODO
 * Authentication for http/ftp for the calendar file.  This will let you use a private google calendar.
 * Pluggable player support.
-* * MPD
-* * Mplayer
-* * Generic command
+  * MPD
+  * Mplayer
+  * Generic command
 * Some basic caching of the ical file, so that it works better on slow links.
 * Finish the Pluggable source/storage code
 
