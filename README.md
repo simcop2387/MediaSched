@@ -52,9 +52,9 @@ The older version is still in use by me, and has two forks, one for mplayer and 
 # TODO
 * Authentication for http/ftp for the calendar file.  This will let you use a private google calendar.
 * Pluggable player support.
-** MPD
-** Mplayer
-** Generic command
+* * MPD
+* * Mplayer
+* * Generic command
 * Some basic caching of the ical file, so that it works better on slow links.
 * Finish the Pluggable source/storage code
 
