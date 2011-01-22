@@ -12,8 +12,6 @@ use MediaConfig;
 sub init_player {
   my ($self, $alias, $loop) = @_; 
   
-  print Dumper($alias, $loop);
-  sleep(1);
   my $player_conf = get_config("player_config");
   $player_conf //= {useedl=>1};
   my $ses = POE::Session->create(

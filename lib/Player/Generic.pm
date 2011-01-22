@@ -13,13 +13,10 @@ use MediaConfig;
 
 sub init_player {
   my ($self, $alias, $loop) = @_; 
+
+  my %player_conf = %{get_config("player_config")};
   
-  print Dumper($alias, $loop);
-  sleep(1);
-  my $player_conf = get_config("player_config");
-  $player_conf //= {};
-  
-  die "You need to tell us which command you want to run for the Generic player plugin" if (!$player_conf->{binary});
+  die "You need to tell us which command you want to run for the Generic player plugin" if (!$player_conf{binary});
   
   my $ses = POE::Session->create(
   package_states => 
@@ -27,7 +24,7 @@ sub init_player {
       "Player::Generic" => [ qw(_start get_time new_file) ],
 	],
 	heap =>{alias => $alias,
-		    loop => $loop, player_conf => $player_conf
+		    loop => $loop, player_conf => \%player_conf
 	});
 }
 
