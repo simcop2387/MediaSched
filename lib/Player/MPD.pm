@@ -77,6 +77,7 @@ sub get_queue {
 
     for ($mpd->playlist->as_items())
     {
+      print "T: $total\n";
       $total+=$_->time();
     }
    
@@ -96,17 +97,34 @@ sub get_time {
 	my ($kernel, $heap) = @_[KERNEL, HEAP];
 	my $mpd = $heap->{mpd};
 	
-	return $kernel->call("get_queue")+time(); # we don't queue anything up so this always NOW
+	my $time = time();
+	$time += $kernel->call($_[SESSION], "get_queue");
+	
+	return $time; # we don't queue anything up so this always NOW
 }
 
 # new_file tells us that there's a new file to play
 sub new_file {
-	my ($kernel, $heap, $file, $basename) = @_[KERNEL, HEAP, ARG0, ARG1];
+	my ($kernel, $heap, $file) = @_[KERNEL, HEAP, ARG0, ARG1];
 	my $mpd = $heap->{mpd};
+	
+	my $basename;
+	my @storage = @{get_config("storage")};
+	
+	#we have to strip the storage directory off, or mpd won't find the files! yuck
+	for my $dir (@storage) {
+		if ($file =~ /^$dir/) {
+			$basename = $file;
+			$basename =~ s|^$dir||;
+			$basename =~ s|^/+||; # remove any extra / that got added, NORMAL programs don't care about extra /, but MPD is "SPECIAL"
+			last;
+		}
+	}
 	
 	#die "wtf" unless (defined($file) && $file ne "");
 	
-	eval {$mpd->playlist->add($basename);} # eval to ignore missing files, no need to make my life miserable because of a bad playlist
+	eval {$mpd->playlist->add($basename);}; # eval to ignore missing files, no need to make my life miserable because of a bad playlist
+	warn "on file $basename: $@" if $@; # display the error if it had one
 }
 
 1;

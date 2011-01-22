@@ -16,6 +16,8 @@ use DateTime::Format::ISO8601;
 
 use POE qw(Session);
 
+use Carp qw(cluck);
+
 my $ses = POE::Session->create(
   package_states => 
     [
@@ -164,16 +166,21 @@ sub get_sched {
     	} else {
     		# range is [$dtstart, $dtend) that way a new event can start at $dtend without a conflict
     		if ($nowdt >= $dtstart && $nowdt < $dtend) {
+    		  print "Got non repeating event!\n";
+    		  _printentry($event);
     		  push @events, $event;
     		}
     	}
 	}
 	
+	print Dumper(\@events);
 	# in case we've got more than one event, we're going to sort them by creation time
-	my @sevents = map {$_->[1]} sort {$a->[0] cmp $b->[0]} map {[_prop($_, "created"), $_]} @events;
+	my @sevents = map {$_->[1]} sort {$a->[0] cmp $b->[0]} map {[_prop($_, "dtstart"), $_]} @events;
 	_printentry($_) for (@sevents);
 #	sleep(30);
 
+    sleep(10);
+    
     if (@sevents) {
     	return (_prop($sevents[0], "description"), _prop($sevents[0], "uid"))
     }
@@ -182,6 +189,7 @@ sub get_sched {
 # borrowed from Data::ICal example
 sub _prop {
     my($event, $key) = @_;
+    print Dumper(\@_);
     my $v = $event->property($key) or return;
     $v->[0]->value;
 }
@@ -208,6 +216,8 @@ sub _checktimeonly {
 
 sub _printentry {
 	my $entry = shift;
+	
+	return unless defined $entry;
 	
 	print "---\n",
 	      _prop($entry, "summary"), "\n",
