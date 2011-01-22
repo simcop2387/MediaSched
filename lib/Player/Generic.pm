@@ -14,7 +14,7 @@ use MediaConfig;
 sub init_player {
   my ($self, $alias, $loop) = @_; 
 
-  my %player_conf = %{get_config("player_config")};
+  my %player_conf = %{get_config("player_conf")};
   
   die "You need to tell us which command you want to run for the Generic player plugin" if (!$player_conf{binary});
   
@@ -26,6 +26,9 @@ sub init_player {
 	heap =>{alias => $alias,
 		    loop => $loop, player_conf => \%player_conf
 	});
+    POE::Kernel->post($loop, "playfile"); # start us up!
+    
+    return $ses;
 }
 
 sub _start {

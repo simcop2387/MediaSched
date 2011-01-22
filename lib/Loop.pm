@@ -30,8 +30,6 @@ sub _start
 	my $player = "Player::$player_name"->init_player('Player', $session);
 	
 	$heap->{player} = $player;
-
-	$kernel->yield("playfile");	
 }
 
 sub playfile
@@ -39,8 +37,8 @@ sub playfile
 	my ($kernel, $heap) = @_[KERNEL, HEAP];
 	
 	my $nexttime = $kernel->call(Player=>get_time=>);
-	my $file = $kernel->call(Lists=>getepisode=>$nexttime);
+	my ($file, $basename) = $kernel->call(Lists=>getepisode=>$nexttime);
 	print "Posted a file! $file\n";
 	
-	$kernel->post(Player=> new_file => $file);
+	$kernel->post(Player=> new_file => $file, $basename);
 }

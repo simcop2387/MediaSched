@@ -1,8 +1,7 @@
-statefile: tv.state
-defaultlist: defaults/masterdefault.lst
+statefile: radio.state
+defaultlist: master.m3u
 storage:
         - /mnt/server/pub/Music/
-        - ./defaults/
 calendar: http://newradio/radiosched/publish.php/radiosched.ics
 timezone: America/New_York
 directoryscan:

@@ -12,7 +12,7 @@ use MediaConfig;
 sub init_player {
   my ($self, $alias, $loop) = @_; 
   
-  my $player_conf = get_config("player_config");
+  my $player_conf = get_config("player_conf");
   $player_conf //= {useedl=>1};
   my $ses = POE::Session->create(
   package_states => 
@@ -22,6 +22,9 @@ sub init_player {
 	heap =>{alias => $alias, useedl=>$player_conf->{useedl},
 		    loop => $loop,
 	});
+	
+	POE::Kernel->post($loop, "playfile"); # start us up!
+	return $ses;
 }
 
 sub _start {

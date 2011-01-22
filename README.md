@@ -70,7 +70,10 @@ There's a simple config.yml file here, should be mostly self explanitory.
     What program to run for each file to play; no default, *this option is required*
   * args
     Additional arguments to the binary.  use %f to put the file in a specific place of the arguments.  defaults to: %f
- 
+
+# PLAYER NOTES
+MPD has a minor setup issue where you have to have the storage paths the same as in MPD.  Otherwise it'll claim that it can't find the files constantly. 
+
 # HISTORY
 an older version of this software was originally written to use the database of WebCalendar (http://www.k5n.us/webcalendar.php) directly (from the 2007 era).
 I've rewritten this part of it to instead use iCal directly so that more software can be supported. even using a local file so you don't have to have a constant connection to the database or the internet without having to setup a whole webserver, database, and php installation.
@@ -81,7 +84,7 @@ The older version is still in use by me, and has two forks, one for mplayer and 
 * Some basic caching of the ical file, so that it works better on slow links.
 * Finish the Pluggable source/storage code
 
-    This is all about being able to collect things from other places (mostly mythtv in my case) for playback
+    This is all about being able to collect things from other places (mostly mythtv in my case) for playback.  I also need this for generating
 
 # DEPENDENCIES
 lots.  figure them out for yourself until i get it all packaged up nicely.

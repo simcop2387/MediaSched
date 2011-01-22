@@ -9,20 +9,18 @@ use MediaConfig;
 
 use Audio::MPD;
 
-# at the moment the mplayer plugin does it blockingly, i'm not controlling it async at all, which isn't a great idea
-
 sub init_player {
   my ($self, $alias, $loop) = @_; 
   
   my %player_conf = (host => "localhost", port => 6600, queuelength=>1800, queuesongs=>3);
-  %player_conf =(%player_conf, %{get_config("player_config")});
+  %player_conf =(%player_conf, %{get_config("player_conf")});
   
   my $mpd = Audio::MPD->new(\%player_conf); # use the same hash from the yaml, this will let you pass additional options if they ever exist
   
   my $ses = POE::Session->create(
   package_states => 
     [
-      "Player::MPD" => [ qw(_start get_time new_file tick checkplay removeold) ],
+      "Player::MPD" => [ qw(_start get_time new_file tick checkplay removeold get_queue get_songs) ],
 	],
 	heap =>{alias => $alias, player_conf=>\%player_conf,
 		    loop => $loop, mpd => $mpd,
@@ -72,6 +70,8 @@ sub removeold { # get rid of stuff already played
 sub get_queue {
 	my ($kernel, $heap) = @_[KERNEL, HEAP];
 	my $mpd = $heap->{mpd};
+	
+	print "Get_queue\n";
 
     my $total = 0;
 
@@ -101,12 +101,12 @@ sub get_time {
 
 # new_file tells us that there's a new file to play
 sub new_file {
-	my ($kernel, $heap, $file) = @_[KERNEL, HEAP, ARG0];
+	my ($kernel, $heap, $file, $basename) = @_[KERNEL, HEAP, ARG0, ARG1];
 	my $mpd = $heap->{mpd};
 	
-	die "wtf" unless (defined($file) && $file ne "");
+	#die "wtf" unless (defined($file) && $file ne "");
 	
-	$mpd->playlist->add($file);
+	eval {$mpd->playlist->add($basename);} # eval to ignore missing files, no need to make my life miserable because of a bad playlist
 }
 
 1;

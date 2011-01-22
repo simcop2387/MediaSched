@@ -64,7 +64,7 @@ sub getepisode
 	
 	debug 3, "Got List $id";
 	
-	my $file = resolveEntry($list, $id, $heap);
+	my ($file, $basename) = resolveEntry($list, $id, $heap);
 	
 	if ($file =~ /^mythtv~(.*)/) #grab the mythtv stuff, i'll extend this later to support specific episodes
 	{
@@ -72,7 +72,7 @@ sub getepisode
 		$file = findentity($file); #resolve the path
 	}
 	
-	return $file;
+	return ($file, $basename);
 }
 
 sub resolveEntry
@@ -82,8 +82,9 @@ sub resolveEntry
 	my $heap = shift;
 	
 	my $filename = parseListEntry($list, $id);
-	my $file = readFileFromPlaylist($filename, $id, $heap);
+	my ($file, $basename) = readFileFromPlaylist($filename, $id, $heap);
 	
+	return ($file, $basename);
 }
 
 sub findentity
@@ -165,7 +166,7 @@ sub readFileFromPlaylist
   print "RFFPL\n$file\n$stateid\n\n";
   
   if ($file =~ /^%/)
-  {
+  { # NTS, this doesn't correctly work with $basename yet, update this!!!!
     $file =~ s/^%//g;
     debug 3, "$stateid :: $file";
 
@@ -187,18 +188,19 @@ sub readFileFromPlaylist
   }
   else
   {
+  	$file =~ s/[\r\n]+$//; # remove trailing newlines
     print "\n\nOpening <",$file," from ",findentity($file),"\n\n\n";
 
     my $list=getFileList($file, $heap);
     
-    if ($list =~ /\n./)
+    if ($list =~ /\n./) # look for a newline
     {
-    	my $next=resolveEntry($list, $stateid."::".$file, $heap);#we append the file to the id, so that we get separate ids
-    	return $next;
+    	my ($next, $basename) = resolveEntry($list, $stateid."::".$file, $heap);#we append the file to the id, so that we get separate ids
+    	return ($next, $basename);
     }
     else
     {
-    	return $list
+    	return ($list, $file);
     }
   }
 }
