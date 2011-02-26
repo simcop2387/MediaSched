@@ -21,7 +21,7 @@ sub init_player {
   my $ses = POE::Session->create(
   package_states => 
     [
-      "Player::Generic" => [ qw(_start get_time new_file) ],
+      "MediaSched::Player::Generic" => [ qw(_start get_time new_file) ],
 	],
 	heap =>{alias => $alias,
 		    loop => $loop, player_conf => \%player_conf

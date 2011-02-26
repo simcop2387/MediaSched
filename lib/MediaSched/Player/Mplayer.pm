@@ -17,7 +17,7 @@ sub init_player {
   my $ses = POE::Session->create(
   package_states => 
     [
-      "Player::Mplayer" => [ qw(_start get_time new_file) ],
+      "MediaSched::Player::Mplayer" => [ qw(_start get_time new_file) ],
 	],
 	heap =>{alias => $alias, useedl=>$player_conf->{useedl},
 		    loop => $loop,
@@ -41,7 +41,9 @@ sub get_time {
 # new_file tells us that there's a new file to play
 sub new_file {
 	my ($kernel, $heap, $file) = @_[KERNEL, HEAP, ARG0];
-	
+
+    print Dumper(\@_);
+    
 	die "wtf" unless (defined($file) && $file ne "");
 
 	if ($heap->{useedl} && -e "$file.edl")

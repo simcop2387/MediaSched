@@ -8,6 +8,6 @@ use warnings;
 use lib './lib';
 
 use POE;
-use Loop; # this does the real work
+use MediaSched::Loop; # this does the real work
 
 POE::Kernel->run();

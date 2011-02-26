@@ -17,7 +17,7 @@ use POE qw(Session);
 my $ses = POE::Session->create(
   package_states => 
     [
-      Lists => [ qw(_start getepisode) ],
+      "MediaSched::Lists" => [ qw(_start getepisode) ],
 	],
 	heap =>{shows=>[], includeregex=>undef, excluderegex=>undef});
 

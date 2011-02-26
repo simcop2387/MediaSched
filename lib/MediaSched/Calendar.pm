@@ -21,7 +21,7 @@ use Carp qw(cluck);
 my $ses = POE::Session->create(
   package_states => 
     [
-      Calendar => [ qw(_start get_sched) ],
+      "MediaSched::Calendar" => [ qw(_start get_sched) ],
 	],);
 
 #no need to recreate this all the time

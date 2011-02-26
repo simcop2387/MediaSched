@@ -20,7 +20,7 @@ sub init_player {
   my $ses = POE::Session->create(
   package_states => 
     [
-      "Player::MPD" => [ qw(_start get_time new_file tick checkplay removeold get_queue get_songs) ],
+      "MediaSched::Player::MPD" => [ qw(_start get_time new_file tick checkplay removeold get_queue get_songs) ],
 	],
 	heap =>{alias => $alias, player_conf=>\%player_conf,
 		    loop => $loop, mpd => $mpd,

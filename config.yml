@@ -1,14 +1,15 @@
-statefile: radio.state
-defaultlist: master.m3u
+statefile: tv.state
+defaultlist: dbcart
 storage:
-        - /mnt/server/pub/Music/
-calendar: http://newradio/radiosched/publish.php/radiosched.ics
+        - defaults/
+        - /media/pub/Movies/
+calendar: http://newradio/moviesched/publish.php/moviesched.ics
 timezone: America/New_York
 directoryscan:
-    include: 
-        - \.(?:mp3|wave?)$
+    include:
+        - \.(?:avi|m4v|mpe?g|mkv|ogg|ogm)$
     exclude: 
         - \(noauto\)
-player: MPD
-player_conf:
-    host: radio
+player: Mplayer
+#player_conf:
+#    host: radio

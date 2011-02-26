@@ -12,7 +12,7 @@ use Net::Telnet;
 my $ses = POE::Session->create(
   package_states => 
     [
-      Mythtv => [ qw(_start getlist updatelist parselist matchshow) ],
+      "MediaSched::Plugin::Storage::Mythtv" => [ qw(_start getlist updatelist parselist matchshow) ],
 	],
 	heap =>{shows=>[]});
 	

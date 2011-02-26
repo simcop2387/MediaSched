@@ -14,20 +14,21 @@ use POE qw(Session);
 my $ses = POE::Session->create(
   package_states => 
     [
-      Loop => [ qw(_start playfile) ],
+      "MediaSched::Loop" => [ qw(_start playfile) ],
 	],
 	heap =>{});
 
+#is there a cleaner way to do the loading? maybe
 sub _start
 {
 	my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
 	
 	my $player_name = get_config("player");
-	eval "use Player::$player_name;";
+    eval "use MediaSched::Player::$player_name;";
 	
 	die $@ if $@;
 	
-	my $player = "Player::$player_name"->init_player('Player', $session);
+    my $player = "MediaSched::Player::$player_name"->init_player('Player', $session);
 	
 	$heap->{player} = $player;
 }
