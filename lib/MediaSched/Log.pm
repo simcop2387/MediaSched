@@ -1,4 +1,4 @@
-package Log;
+package MediaSched::Log;
 
 # ABSTRACT: turns baubles into trinkets
 

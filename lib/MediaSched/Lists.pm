@@ -1,4 +1,4 @@
-package Lists;
+package MediaSched::Lists;
 
 # ABSTRACT: turns baubles into trinkets
 
@@ -7,10 +7,10 @@ use warnings;
 use Data::Dumper;
 use List::Util qw/reduce/;
 
-use State;
-use Log;
-use Calendar;
-use MediaConfig;
+use MediaSched::State;
+use MediaSched::Log;
+use MediaSched::Calendar;
+use MediaSched::MediaConfig;
 
 use POE qw(Session);
 

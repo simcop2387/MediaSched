@@ -1,13 +1,13 @@
-package Loop;
+package MediaSched::Loop;
 
 use strict;
 use warnings;
 use feature qw{switch};
 
-use State;
-use MediaConfig;
-use Log;
-use Lists;
+use MediaSched::State;
+use MediaSched::MediaConfig;
+use MediaSched::Log;
+use MediaSched::Lists;
 
 use POE qw(Session);
 

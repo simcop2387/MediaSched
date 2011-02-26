@@ -1,4 +1,4 @@
-package Mythtv;
+package MediaSched::Plugin::Storage::Mythtv;
 
 # ABSTRACT: turns baubles into trinkets
 

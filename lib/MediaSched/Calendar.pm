@@ -1,4 +1,4 @@
-package Calendar;
+package MediaSched::Calendar;
 
 # ABSTRACT: turns baubles into trinkets
 
@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use feature qw(switch);
 
-use MediaConfig;
+use MediaSched::MediaConfig;
 
 use Data::Dumper;
 use Data::ICal;

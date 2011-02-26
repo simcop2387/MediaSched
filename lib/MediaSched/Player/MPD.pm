@@ -1,11 +1,11 @@
-package Player::MPD;
+package MediaSched::Player::MPD;
 
 use strict;
 use warnings;
 
 use Data::Dumper;
 use POE qw(Session);
-use MediaConfig;
+use MediaSched::MediaConfig;
 
 use Audio::MPD;
 

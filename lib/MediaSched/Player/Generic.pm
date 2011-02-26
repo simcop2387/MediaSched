@@ -1,13 +1,13 @@
-package Player::Generic;
+package MediaSched::Player::Generic;
 
-package Player::Mplayer;
+package MediaSched::Player::Mplayer;
 
 use strict;
 use warnings;
 
 use Data::Dumper;
 use POE qw(Session);
-use MediaConfig;
+use MediaSched::MediaConfig;
 
 # at the moment the mplayer plugin does it blockingly, i'm not controlling it async at all, which isn't a great idea
 

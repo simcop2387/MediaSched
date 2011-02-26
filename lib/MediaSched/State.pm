@@ -1,11 +1,11 @@
-package State;
+package MediaSched::State;
 
 # ABSTRACT: turns baubles into trinkets
 
 use strict;
 use warnings;
 
-use MediaConfig;
+use MediaSched::MediaConfig;
 
 require Exporter;
 use base qw(Exporter);

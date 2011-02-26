@@ -1,4 +1,4 @@
-package MediaConfig;
+package MediaSched::MediaConfig;
 
 # ABSTRACT: turns baubles into trinkets
 
