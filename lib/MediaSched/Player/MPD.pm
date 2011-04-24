@@ -110,7 +110,10 @@ sub new_file {
 	
 	my $basename;
 	my @storage = @{get_config("storage")};
-	
+
+        if (!-f $file) {
+                die "Got non-existant file"; # this will be non-fatal later.  it'll just trigger another look, but i need to catch it right now.
+        }	
 	#we have to strip the storage directory off, or mpd won't find the files! yuck
 	for my $dir (@storage) {
 		if ($file =~ /^$dir/) {
@@ -121,7 +124,8 @@ sub new_file {
 		}
 	}
 	
-	#die "wtf" unless (defined($file) && $file ne "");
+#	die "wtf" unless (defined($file) && $file ne "");
+        die "Was given raw playlist $file" if ($file =~ /m3u|pls/);
 	
 	eval {$mpd->playlist->add($basename);}; # eval to ignore missing files, no need to make my life miserable because of a bad playlist
 	warn "on file $basename: $@" if $@; # display the error if it had one
