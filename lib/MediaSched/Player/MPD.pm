@@ -114,6 +114,7 @@ sub new_file {
         if (!-f $file) {
             $kernel->delay(tick => 5); # retry in 5 seconds.  use delay instead of delay_add to prevent hundreds of things from showing up
             warn "Got non-existant file"; # this will be non-fatal later.  it'll just trigger another look, but i need to catch it right now.
+            return; # don't continue
         }	
 	#we have to strip the storage directory off, or mpd won't find the files! yuck
 	for my $dir (@storage) {
