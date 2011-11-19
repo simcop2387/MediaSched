@@ -3,6 +3,7 @@ I won't claim this will work for anyone else yet.
 
 # CONFIG
 There's a simple config.yml file here, should be mostly self explanitory.
+
     statefile: tv.state
     defaultlist: masterdefault.lst
     storage:
