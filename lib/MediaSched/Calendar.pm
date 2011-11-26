@@ -173,7 +173,7 @@ sub get_sched {
     	}
 	}
 	
-	print Dumper(\@events);
+#	print Dumper(\@events);
 	# in case we've got more than one event, we're going to sort them by creation time
 	my @sevents = map {$_->[1]} sort {$a->[0] cmp $b->[0]} map {[_prop($_, "dtstart"), $_]} @events;
 	_printentry($_) for (@sevents);
@@ -189,7 +189,7 @@ sub get_sched {
 # borrowed from Data::ICal example
 sub _prop {
     my($event, $key) = @_;
-    print Dumper(\@_);
+#    print Dumper(\@_);
     my $v = $event->property($key) or return;
     $v->[0]->value;
 }
