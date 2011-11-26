@@ -163,8 +163,11 @@ sub readFileFromPlaylist
   my $heap = shift;
   my $pl;
   
-  print "RFFPL\n$file\n$stateid\n\n";
-  
+  print "Readfilefromplaylist : $file :: $stateid\n";
+
+  print Dumper($_state);
+  sleep 10;  
+
   if ($file =~ /^%/)
   { # NTS, this doesn't correctly work with $basename yet, update this!!!!
     $file =~ s/^%//g;
@@ -245,7 +248,7 @@ sub parseListEntry
 
        for (@lines)
        {
-         my ($list, $portion) = m/^(.*):(\d+)$/g; 
+         my ($list, $portion) = ($_ =~ m/^(.*):(\d+)\s*$/g);
          #split(/:/, $_);
          $portion =~ s/[\r\n]//g;
          if (($list ne "") && defined($portion) && ($portion != 0))
