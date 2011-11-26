@@ -42,4 +42,5 @@ sub playfile
 	print "Posted a file! $file\n";
 	
 	$kernel->post(Player=> new_file => $file, $basename);
+        MediaSched::State::savestate();
 }
