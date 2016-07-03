@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # This is a simple script, just around for starting the kernel and setting up the environment, will eventually pull config stuff from @ARGV
 

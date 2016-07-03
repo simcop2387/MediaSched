@@ -59,6 +59,7 @@ sub getepisode
 	
 	if (!defined($id))
 	{#once i have this as recursive, i'll move this into a real file
+                debug 3, "Using default list, given $list, $id";
 		($list, $id) = (get_config("defaultlist"), -1);
 	}
 	
@@ -163,10 +164,10 @@ sub readFileFromPlaylist
   my $heap = shift;
   my $pl;
   
-  print "Readfilefromplaylist : $file :: $stateid\n";
+  debug 3, "Readfilefromplaylist : $file :: $stateid\n";
 
-  print Dumper($_state);
-  sleep 10;  
+  debug 4, Dumper($_state);
+#  sleep 10;  
 
   if ($file =~ /^%/)
   { # NTS, this doesn't correctly work with $basename yet, update this!!!!
@@ -183,7 +184,7 @@ sub readFileFromPlaylist
     my $list=getFileList($file, $heap);
 	debug 3, "$stateid :: $list";
     my @list=sort split(/\n/, $list);
-	debug 3, Dumper(\@list);
+	debug 4, Dumper(\@list);
 
     #increment and mod
     $_state->{playlists}{$stateid}=($_state->{playlists}{$stateid}+1)%@list;

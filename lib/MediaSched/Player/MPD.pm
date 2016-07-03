@@ -53,7 +53,7 @@ sub tick {
 	
 	$kernel->yield("removeold");
 	
-	$kernel->delay_add(tick => 60); # setup the next check
+	$kernel->delay_add(tick => 5); # setup the next check
 }
 
 sub removeold { # get rid of stuff already played
