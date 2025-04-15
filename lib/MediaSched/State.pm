@@ -27,9 +27,8 @@ sub loadstate
 {
   if (-e get_config('statefile')) {
     try {
-      %state = read_sereal_file($state_file)->@*;
-    } catch {
-      my $e = $@;
+      %state = read_sereal_file($state_file)->%*;
+    } catch($e) {
       warn "Failed to read state file, keeping blank state, will overwrite: $e";
     }
   }
