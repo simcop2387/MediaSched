@@ -166,7 +166,7 @@ sub readFileFromPlaylist
   
   debug 3, "Readfilefromplaylist : $file :: $stateid\n";
 
-  debug 4, Dumper($_state);
+  debug 4, Dumper(\%state);
 #  sleep 10;  
 
   if ($file =~ /^%/)
@@ -174,11 +174,11 @@ sub readFileFromPlaylist
     $file =~ s/^%//g;
     debug 3, "$stateid :: $file";
 
-    if (!exists($_state->{playlists}{$stateid}))
+    if (!exists($state{playlists}{$stateid}))
     {
       #state for this playlist doesn't exist so lets initalize it
       #we initilize to -1 because we increment it soon
-      $_state->{playlists}{$stateid}=-1;
+      $state{playlists}{$stateid}=-1;
     }
 
     my $list=getFileList($file, $heap);
@@ -187,8 +187,8 @@ sub readFileFromPlaylist
 	debug 4, Dumper(\@list);
 
     #increment and mod
-    $_state->{playlists}{$stateid}=($_state->{playlists}{$stateid}+1)%@list;
-    return $list[$_state->{playlists}{$stateid}];
+    $state{playlists}{$stateid}=($state{playlists}{$stateid}+1)%@list;
+    return $list[$state{playlists}{$stateid}];
   }
   else
   {
@@ -238,14 +238,14 @@ sub parseListEntry
      my @lines = cleanandsplit($listout);
      #!The Beatles.m3u:1
 
-     if ((!defined($_state->{multi}{$cid})) || ($_state->{multi}{$cid}{cont} ne join("\n", @lines)))
+     if ((!defined($state{multi}{$cid})) || ($state{multi}{$cid}{cont} ne join("\n", @lines)))
      {
        print("we have a new one! initilize!!! $cid\n");
-       $_state->{multi}{$cid}{cont} = join("\n", @lines);
-       $_state->{multi}{$cid}{lists} = [];
-       $_state->{multi}{$cid}{count} = [];
-       $_state->{multi}{$cid}{ratio} = [];
-       $_state->{multi}{$cid}{lastint} = 0;
+       $state{multi}{$cid}{cont} = join("\n", @lines);
+       $state{multi}{$cid}{lists} = [];
+       $state{multi}{$cid}{count} = [];
+       $state{multi}{$cid}{ratio} = [];
+       $state{multi}{$cid}{lastint} = 0;
 
        for (@lines)
        {
@@ -254,9 +254,9 @@ sub parseListEntry
          $portion =~ s/[\r\n]//g;
          if (($list ne "") && defined($portion) && ($portion != 0))
          {
-           push @{$_state->{multi}{$cid}{lists}}, $list;
-           push @{$_state->{multi}{$cid}{count}}, 1;
-           push @{$_state->{multi}{$cid}{ratio}}, $portion;
+           push @{$state{multi}{$cid}{lists}}, $list;
+           push @{$state{multi}{$cid}{count}}, 1;
+           push @{$state{multi}{$cid}{ratio}}, $portion;
          }
        }
      }
@@ -267,15 +267,15 @@ sub parseListEntry
      while(1)
      {
        #pick new list, then song
-       $_state->{multi}{$cid}{lastint} = ($_state->{multi}{$cid}{lastint}+1) % @{$_state->{multi}{$cid}{count}};
-       my $lastint = $_state->{multi}{$cid}{lastint};
-       $q = ${$_state->{multi}{$cid}{ratio}}[($lastint+1)% @{$_state->{multi}{$cid}{ratio}}]/${$_state->{multi}{$cid}{ratio}}[$lastint];
-       $s = ${$_state->{multi}{$cid}{count}}[($lastint+1)% @{$_state->{multi}{$cid}{count}}]/${$_state->{multi}{$cid}{count}}[$lastint];
+       $state{multi}{$cid}{lastint} = ($state{multi}{$cid}{lastint}+1) % @{$state{multi}{$cid}{count}};
+       my $lastint = $state{multi}{$cid}{lastint};
+       $q = ${$state{multi}{$cid}{ratio}}[($lastint+1)% @{$state{multi}{$cid}{ratio}}]/${$state{multi}{$cid}{ratio}}[$lastint];
+       $s = ${$state{multi}{$cid}{count}}[($lastint+1)% @{$state{multi}{$cid}{count}}]/${$state{multi}{$cid}{count}}[$lastint];
             
        if ($s >= $q)
        {
-         ${$_state->{multi}{$cid}{count}}[$lastint]++;
-         $next = ${$_state->{multi}{$cid}{lists}}[$lastint];
+         ${$state{multi}{$cid}{count}}[$lastint]++;
+         $next = ${$state{multi}{$cid}{lists}}[$lastint];
          last;
        }
      }

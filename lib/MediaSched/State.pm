@@ -11,7 +11,7 @@ use Feature::Compat::Try;
 
 require Exporter;
 use base qw(Exporter);
-our @EXPORT = qw(%state $_state savestate);
+our @EXPORT = qw(%state savestate);
 
 our %state;
 my $state_file = get_config('statefile');

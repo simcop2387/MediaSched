@@ -11,7 +11,7 @@ require Exporter;
 use base qw(Exporter);
 our @EXPORT = qw(debug);
 
-our $debuglevel = 3;
+our $debuglevel = 10;
 
 sub debug
 {
