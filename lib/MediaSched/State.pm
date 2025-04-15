@@ -6,27 +6,33 @@ use strict;
 use warnings;
 
 use MediaSched::MediaConfig;
+use Sereal qw/write_sereal_file read_sereal_file/;
+use Feature::Compat::Try;
 
 require Exporter;
 use base qw(Exporter);
 our @EXPORT = qw(%state $_state savestate);
 
 our %state;
-#this is kept around for legacy reasons, there's still code that uses the old name
-our $_state = \%state;
-
-use Storable qw(lock_nstore retrieve);
+my $state_file = get_config('statefile');
 
 END {savestate()}; # make sure to save the state whenever we close
 
 sub savestate
 {
-	lock_nstore \%state, get_config("statefile");
+  write_sereal_file($state_file, \%state);
 }
 
 sub loadstate
 {
-	%state = %{retrieve(get_config("statefile"))} if (-e get_config("statefile"));
+  if (-e get_config('statefile')) {
+    try {
+      %state = read_sereal_file($state_file)->@*;
+    } catch {
+      my $e = $@;
+      warn "Failed to read state file, keeping blank state, will overwrite: $e";
+    }
+  }
 }
 
 loadstate();

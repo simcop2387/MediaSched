@@ -4,5 +4,6 @@ requires 'Data::ICal';
 requires 'LWP::UserAgent::POE';
 requires 'DateTime';
 requires 'DateTime::Format::ISO8601';
-requires 'IO::Prompt::Tiny';
 requires 'Audio::MPD';
+requires 'Sereal';
+requires 'Feature::Compat::Try';
