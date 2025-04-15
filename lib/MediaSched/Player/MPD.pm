@@ -6,6 +6,7 @@ use warnings;
 use Data::Dumper;
 use POE qw(Session);
 use MediaSched::MediaConfig;
+use MediaSched::Log;
 
 use Audio::MPD;
 
@@ -38,19 +39,24 @@ sub _start {
 sub checkplay {
 	my ($kernel, $heap) = @_[KERNEL, HEAP];
 	my $mpd = $heap->{mpd};
-	
+  debug 3, "Checking playing";	
 	$mpd->play(); # tell it to play right away, just in case
 }
 
 sub tick {
 	my ($kernel, $heap) = @_[KERNEL, HEAP];
+  debug 4, "MPD Tick, get_queue";
 	my $queuelength = $kernel->call($heap->{alias}, "get_queue");
+  debug 4, "MPD Tick, get_songs";
 	my $queuesongs = $kernel->call($heap->{alias}, "get_songs");
-	
+  debug 4, "MPD Tick, check queue length";
+
 	if ($queuelength < $heap->{player_conf}{queuelength} || $queuesongs < $heap->{player_conf}{queuesongs}) {
+    debug 4, "MPD Tick, play file";
 		$kernel->post($heap->{loop}, "playfile");
 	}
 	
+  debug 4, "MPD remove old";
 	$kernel->yield("removeold");
 	
 	$kernel->delay_add(tick => 5); # setup the next check
@@ -62,7 +68,7 @@ sub removeold { # get rid of stuff already played
 
     my $song = $mpd->current();
 
-    if ($song->pos >=1) { # we're not on the first song anymore, it is numbered 0
+    if ($song && $song->pos >=1) { # we're not on the first song anymore, it is numbered 0
        $mpd->playlist->delete($song->pos - 1);  # remove the previous song, even if there is multiple we'll catch them fast enough (assuming that the average clip length is > 60 seconds) # NTS: fix this assumption at some point
     }
 }

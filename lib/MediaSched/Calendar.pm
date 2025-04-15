@@ -7,10 +7,11 @@ use warnings;
 use feature qw(switch);
 
 use MediaSched::MediaConfig;
+use MediaSched::Log;
 
 use Data::Dumper;
 use Data::ICal;
-use LWP::UserAgent::POE; # for async http at least
+use LWP::UserAgent; # for async http at least
 use DateTime;
 use DateTime::Format::ISO8601;	
 
@@ -25,7 +26,7 @@ my $ses = POE::Session->create(
 	],);
 
 #no need to recreate this all the time
-my $ua = LWP::UserAgent::POE->new();
+my $ua = LWP::UserAgent->new();
 my $iso8601 = DateTime::Format::ISO8601->new;
 
 sub _start {
@@ -35,12 +36,15 @@ sub _start {
 }
 
 sub get_calendar {
+  debug 4, "getting cal";
 	my $res = $ua->get(get_config("calendar"));
-	
+	debug 4, "fetched";
+
 	if ($res->is_success()) {
 		return $res->content();
 	} else {
-		die "Couldn't get calendar: ".$res->status_line."\n".$res->content();
+		warn "Couldn't get calendar: ".$res->status_line."\n".$res->content();
+    die;
 	}
 }
 

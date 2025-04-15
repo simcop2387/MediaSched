@@ -56,7 +56,9 @@ sub getepisode
 	debug 3, "Getepisode called";
 	
 	my ($list, $id) = $kernel->call(Calendar => get_sched => time());
-	
+
+  debug 4, "Got cal!";
+
 	if (!defined($id))
 	{#once i have this as recursive, i'll move this into a real file
                 debug 3, "Using default list, given $list, $id";
